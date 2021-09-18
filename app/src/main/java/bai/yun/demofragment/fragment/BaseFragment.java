@@ -27,19 +27,9 @@ public abstract class BaseFragment extends Fragment implements View.OnClickListe
     private boolean mIsVisiableToUser = false;
 
     /**
-     * 视图是否准备好，当onViewCreated()方法时为true
-     */
-    private boolean mIsViewCreated = false;
-
-    /**
      * 是否第一次加载Fragment
      */
     private boolean mIsFirstCreate = true;
-
-    /**
-     * 父控件是否显示，如果本身就是父控件，则此变量恒为ture
-     */
-    private boolean mIsParentFragmentVisiable = false;
 
     /**
      * 获取视图布局文件
@@ -86,7 +76,6 @@ public abstract class BaseFragment extends Fragment implements View.OnClickListe
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         log("onViewCreated");
-        mIsViewCreated = true;
         initView(view);
     }
 
@@ -115,7 +104,6 @@ public abstract class BaseFragment extends Fragment implements View.OnClickListe
         // 如果是父Fragment，则走实际的代码，
         // 如果是子fragment，则由父fragment向下分发显示与否
         if (!isChildFragment()) {
-            mIsParentFragmentVisiable = true;
             //首次加载Fragment，手动调用fragment显示
             if (mIsFirstCreate) {
                 onFragmentVisiable();
@@ -194,12 +182,12 @@ public abstract class BaseFragment extends Fragment implements View.OnClickListe
         log("visiableChange");
         if (mIsVisiableToUser) {
             onFragmentVisiable();
-            //如果是父控件
-            if (!isChildFragment()) {
-                adviseChildFragment();
-            }
         } else {
             onFragmentInvisiable();
+        }
+        //如果是父fragment，则向子fragment传递是否显示
+        if (!isChildFragment()) {
+            adviseChildFragment();
         }
     }
 
@@ -218,7 +206,13 @@ public abstract class BaseFragment extends Fragment implements View.OnClickListe
                 if (childFragment instanceof BaseFragment) {
                     boolean childFragmentIsShow = ((BaseFragment) childFragment).mIsVisiableToUser;
                     log("adviseChildFragment|刷新的子fragment是否显示 = " + childFragmentIsShow);
-                    childFragment.setUserVisibleHint(childFragmentIsShow);
+                    //如果父Fragment为可见，则手动调用子fragment的是否显示方法
+                    //否则手动调用子fragment的不可见方法
+                    if (mIsVisiableToUser) {
+                        childFragment.setUserVisibleHint(childFragmentIsShow);
+                    } else {
+                        ((BaseFragment) childFragment).onFragmentInvisiable();
+                    }
                 } else {
                     childFragment.setUserVisibleHint(true);
                 }
