@@ -8,7 +8,7 @@ import androidx.fragment.app.FragmentPagerAdapter
 
 class BillFragmentAdapter(private var titles: MutableList<String>, private var fragments: MutableList<Fragment>, fm: FragmentManager) : FragmentPagerAdapter(fm) {
 
-    private  var mViewGroup: ViewGroup? = null
+    private var mViewGroup: ViewGroup? = null
 
     override fun getCount(): Int {
         return fragments.size
@@ -23,12 +23,14 @@ class BillFragmentAdapter(private var titles: MutableList<String>, private var f
     }
 
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
-        Log.d("baibaibai", "instantiateItem|container = " + container.id)
-        val aa = super.instantiateItem(container, position)
+        Log.d("BillFragmentAdapter", "instantiateItem|container = " + container.id)
         mViewGroup = container
-        return aa
+        return super.instantiateItem(container, position)
     }
 
+    /**
+     * 获取Item的viewGroup
+     */
     fun getViewGroup(): ViewGroup? {
         return mViewGroup
     }

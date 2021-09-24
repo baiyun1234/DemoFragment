@@ -27,6 +27,12 @@ public abstract class BaseFragment extends Fragment implements View.OnClickListe
     private boolean mIsVisiableToUser = false;
 
     /**
+     * 视图是否准备好，当onViewCreated()方法时为true
+     */
+    private boolean mIsViewCreated = false;
+
+
+    /**
      * 是否第一次加载Fragment
      */
     private boolean mIsFirstCreate = true;
@@ -76,6 +82,7 @@ public abstract class BaseFragment extends Fragment implements View.OnClickListe
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         log("onViewCreated");
+        mIsViewCreated = true;
         initView(view);
     }
 
@@ -114,6 +121,9 @@ public abstract class BaseFragment extends Fragment implements View.OnClickListe
                 // -- 从含有子控件的父控件跳转到其他Acitivty，再跳转回来
                 visiableChange();
             }
+        } else if (mIsFirstCreate) {//如果是子Fragment，且是第一次加载
+            visiableChange();
+            mIsFirstCreate = false;
         }
 
     }
@@ -124,6 +134,7 @@ public abstract class BaseFragment extends Fragment implements View.OnClickListe
     public void onPause() {
         super.onPause();
         log("onPause");
+        onFragmentInvisiable();
     }
 
     @Override
@@ -158,7 +169,9 @@ public abstract class BaseFragment extends Fragment implements View.OnClickListe
         log("setUserVisibleHint|isVisibleToUser = " + isVisibleToUser);
         mIsVisiableToUser = isVisibleToUser;
         //因为这个方法会在所有的生命周期之前调用一次，所以过滤出只有视图加载成功后，再进行相应的逻辑
-        visiableChange();
+        if (mIsViewCreated) {
+            visiableChange();
+        }
     }
 
     @Override
