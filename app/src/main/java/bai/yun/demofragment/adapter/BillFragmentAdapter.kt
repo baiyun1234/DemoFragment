@@ -28,11 +28,4 @@ class BillFragmentAdapter(private var titles: MutableList<String>, private var f
         return super.instantiateItem(container, position)
     }
 
-    /**
-     * 获取Item的viewGroup
-     */
-    fun getViewGroup(): ViewGroup? {
-        return mViewGroup
-    }
-
 }

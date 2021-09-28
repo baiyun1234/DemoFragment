@@ -29,21 +29,6 @@ class BillFragment : BaseFragment() {
         vp_bill.adapter = mAdapter
         tl_tabs.setupWithViewPager(vp_bill)
 
-//        val ids = getChildFragmentId()
-//        log("ids = $ids")
-
-    }
-
-    override fun getChildFragmentId(): MutableList<String> {
-        val childFragmentIds = mutableListOf<String>()
-        for (i in mFragments.indices) {//下角标
-            val itemId = mAdapter.getItemId(i)
-            val containerId = mAdapter.getViewGroup()?.id
-            val fragmentNameTag = "android:switcher:$containerId:$itemId"
-            log("fragmentNameTag = $fragmentNameTag")
-            childFragmentIds.add(fragmentNameTag)
-        }
-        return childFragmentIds
     }
 
 }

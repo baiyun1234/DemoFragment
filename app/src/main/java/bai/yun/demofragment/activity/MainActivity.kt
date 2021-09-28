@@ -62,6 +62,7 @@ class MainActivity : AppCompatActivity() {
             fm.add(R.id.view_fragment, fragment, fragmentTag)
         }
         fm.show(fragment)
+//        fm.setMaxLifecycle(fragment, Lifecycle.State.RESUMED)
         fm.commit()
         mCurrentFragment = fragment
     }
