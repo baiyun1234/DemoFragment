@@ -18,7 +18,7 @@ class BillFragment : BaseFragment() {
         return R.layout.fragment_bill
     }
 
-    override fun initView(view: View?) {
+    override fun initView(view: View) {
         mBillBankCardFragment = BillBankCardFragment()
         mBillMobileFragment = BillMobileFragment()
         mFragments.add(mBillBankCardFragment)

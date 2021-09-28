@@ -11,13 +11,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Fragment的基类
+ * Fragment的基类(java文件)
  */
-public abstract class BaseFragment extends Fragment implements View.OnClickListener {
+public abstract class BaseFragmentJava extends Fragment implements View.OnClickListener {
 
     protected String tag = this.getClass().getSimpleName();
 
@@ -187,14 +186,12 @@ public abstract class BaseFragment extends Fragment implements View.OnClickListe
     private void adviseChildFragment(boolean isVisiable) {
         log("adviseChildFragment|isVisiable = " + isVisiable);
         List<Fragment> fragments = getChildFragmentManager().getFragments();
-        if (fragments.size() != 0) {
-            Fragment childFragmen;
-            for (int i = 0; i < fragments.size(); i++) {
-                childFragmen = fragments.get(i);
-                if (childFragmen instanceof BaseFragment) {
-                    boolean childFragmentIsShow = childFragmen.getUserVisibleHint();
-                    ((BaseFragment) childFragmen).visiableChange(isVisiable && childFragmentIsShow);
-                }
+        Fragment childFragmen;
+        for (int i = 0; i < fragments.size(); i++) {
+            childFragmen = fragments.get(i);
+            if (childFragmen instanceof BaseFragmentJava) {
+                boolean childFragmentIsShow = childFragmen.getUserVisibleHint();
+                ((BaseFragmentJava) childFragmen).visiableChange(isVisiable && childFragmentIsShow);
             }
         }
 
@@ -214,6 +211,7 @@ public abstract class BaseFragment extends Fragment implements View.OnClickListe
         logw("onFragmentInvisiable|对用户不可见");
     }
 
+    //region 其他
     protected void log(String msg) {
         Log.d(tag, msg);
     }
@@ -229,4 +227,5 @@ public abstract class BaseFragment extends Fragment implements View.OnClickListe
     public Context getActivityContext() {
         return getActivity().getApplicationContext();
     }
+    //endregion
 }
