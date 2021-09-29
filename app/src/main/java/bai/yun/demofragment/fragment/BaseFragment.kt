@@ -12,8 +12,8 @@ import androidx.fragment.app.Fragment
  * Fragment的基类
  */
 abstract class BaseFragment : Fragment(), View.OnClickListener {
+
     protected var TAG = this.javaClass.simpleName
-//     var TAG: String? = this.javaClass.simpleName
 
     /**
      * 对客户是否可见
@@ -24,6 +24,11 @@ abstract class BaseFragment : Fragment(), View.OnClickListener {
      * 视图是否准备好，当onViewCreated()方法时为true
      */
     private var mIsViewCreated = false
+
+    /**
+     * 子fragment是否允许被调用
+     */
+    private var mIsAllowCalledChild = false
 
     /**
      * 获取视图布局文件
@@ -84,11 +89,30 @@ abstract class BaseFragment : Fragment(), View.OnClickListener {
         super.onStart()
         log("onStart")
     }
-
     //endregion
+
     override fun onResume() {
         super.onResume()
         log("onResume")
+        /* 由于AndroidX中setUserVisibleHint方法被弃用，在使用新的FragmentPagerAdapter，并将behavior参数设置为BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT
+        * 以后，每次滑动，Fragment都会调用onResume和onPause方法。这种情况就与Activity与Fragment相互跳转时调用方法一致（都是onResume和onPause），所以需要
+        * 在该方法进行区分。
+        *
+        * 当behavior参数为BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT时，getUserVIsibleHint参数恒为true
+        *
+        * 过滤子Fragment
+        * -如果父fragment不为空，说明本身是子fragment
+        * --如果该子fragment的父fragment为显示状态，则该子Fragment为显示
+        * */
+        if (parentFragment != null) {
+            if ((parentFragment as BaseFragment).mIsVisiableToUser && userVisibleHint) {
+                mIsAllowCalledChild = true
+                onFragmentVisiable()
+            }
+            return
+        }
+
+        //父Fragment
         if (mIsVisiableToUser && !isHidden && userVisibleHint) {
             onFragmentVisiable()
         }
@@ -97,6 +121,19 @@ abstract class BaseFragment : Fragment(), View.OnClickListener {
     override fun onPause() {
         super.onPause()
         log("onPause")
+        /*
+        * 过滤子Fragment
+        * 同onResume
+        */
+        if (parentFragment != null) {
+            if ((parentFragment as BaseFragment).mIsVisiableToUser && userVisibleHint) {
+                mIsAllowCalledChild = false
+                onFragmentInvisiable()
+            }
+            return
+        }
+
+        //父Fragment
         if (mIsVisiableToUser && !isHidden && userVisibleHint) {
             onFragmentInvisiable()
         }
@@ -124,10 +161,16 @@ abstract class BaseFragment : Fragment(), View.OnClickListener {
     }
     //endregion
 
+    /**
+     * AndroidX已弃用，取而代之的是：
+     *  -- 用FragmentTransaction 调用 setMaxLifecycle()
+     *  --FragmentPagerAdapter 和 FragmentStatePagerAdapter 具有新的构造函数
+     */
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         super.setUserVisibleHint(isVisibleToUser)
         log("setUserVisibleHint|isVisibleToUser = $isVisibleToUser")
         //因为这个方法会在所有的生命周期之前调用一次，所以过滤出只有视图加载成功后，再进行相应的逻辑
+        mIsAllowCalledChild = isVisibleToUser
         if (mIsViewCreated) {
             visiableChange(isVisibleToUser)
         }
@@ -163,14 +206,12 @@ abstract class BaseFragment : Fragment(), View.OnClickListener {
     private fun adviseChildFragment(isVisiable: Boolean) {
         log("adviseChildFragment|isVisiable = $isVisiable")
         val fragments = childFragmentManager.fragments
-        var childFragmentIsShow: Boolean
-        var finallyIsShow: Boolean
         for (childFragment in fragments) {
             if (childFragment is BaseFragment) {
-                childFragmentIsShow = childFragment.getUserVisibleHint()
-                //父Fragment和子Fragment都可见时，子fragment才可见
-                finallyIsShow = isVisiable && childFragmentIsShow
-                childFragment.visiableChange(finallyIsShow)
+                //子Fragment允许被调用，才会走子类的显示/隐藏的方法
+                if (childFragment.mIsAllowCalledChild) {
+                    childFragment.visiableChange(isVisiable)
+                }
             }
         }
     }
@@ -178,14 +219,14 @@ abstract class BaseFragment : Fragment(), View.OnClickListener {
     /**
      * 对用户可见
      */
-    protected fun onFragmentVisiable() {
+    protected open fun onFragmentVisiable() {
         loge("onFragmentVisiable|对用户可见")
     }
 
     /**
      * 对用户不可见
      */
-    protected fun onFragmentInvisiable() {
+    protected open fun onFragmentInvisiable() {
         logw("onFragmentInvisiable|对用户不可见")
     }
 

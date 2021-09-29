@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import bai.yun.demofragment.R
 import bai.yun.demofragment.fragment.BillFragment
 import bai.yun.demofragment.fragment.MainFragment
@@ -62,7 +63,7 @@ class MainActivity : AppCompatActivity() {
             fm.add(R.id.view_fragment, fragment, fragmentTag)
         }
         fm.show(fragment)
-//        fm.setMaxLifecycle(fragment, Lifecycle.State.RESUMED)
+        fm.setMaxLifecycle(fragment, Lifecycle.State.RESUMED)
         fm.commit()
         mCurrentFragment = fragment
     }

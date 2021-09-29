@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 
-class BillFragmentAdapter(private var titles: MutableList<String>, private var fragments: MutableList<Fragment>, fm: FragmentManager) : FragmentPagerAdapter(fm) {
+class BillFragmentAdapter(private var titles: MutableList<String>, private var fragments: MutableList<Fragment>, fm: FragmentManager, behavior: Int) : FragmentPagerAdapter(fm, behavior) {
 
     private var mViewGroup: ViewGroup? = null
 
@@ -23,7 +23,6 @@ class BillFragmentAdapter(private var titles: MutableList<String>, private var f
     }
 
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
-        Log.d("BillFragmentAdapter", "instantiateItem|container = " + container.id)
         mViewGroup = container
         return super.instantiateItem(container, position)
     }
